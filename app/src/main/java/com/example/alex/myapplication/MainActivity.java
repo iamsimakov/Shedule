@@ -1,6 +1,7 @@
 package com.example.alex.myapplication;
 
 import android.os.AsyncTask;
+
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Html;
@@ -18,6 +19,9 @@ import org.json.JSONObject;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -60,6 +64,10 @@ public class MainActivity extends AppCompatActivity {
 
     private class ParseTask extends AsyncTask<Void, Integer, String> {
 
+        private String jsonShedule = "";
+        private String titleShedule = "";
+        private String weekShedule = "";
+
         @Override
         protected String doInBackground(Void... params) {
 
@@ -82,6 +90,13 @@ public class MainActivity extends AppCompatActivity {
                 Document doc = conn.url("http://gu-unpk.ru/schedule/3094////1445817600168/printschedule").ignoreContentType(true).get();
                 resultJson = doc.toString(); //буфер - это объект, переводим в строку
 
+                jsonShedule = resultJson;
+
+                Document document = conn.url("http://gu-unpk.ru/schedule").get();
+
+                titleShedule = document.getElementById("page-wrap").getElementById("inside").getElementById("content").getElementById("content_table").getElementsByAttribute("title_schedule").html();
+//                weekShedule = document.getElementById("page-wrap").getElementById("inside").getElementById("content").select("div[style=\"margin-top: 10px; margin-bottom: 0px\"]").html();
+//                .getElementById("week_schedule")
             } catch (Exception e) {
                 resultJson = "Ошибка чтения: " + e.toString();
             }
@@ -95,42 +110,61 @@ public class MainActivity extends AppCompatActivity {
             myProgressBar.setProgress(100);  //прогресс бар ставим 100%
             myProgressBar.setVisibility(View.INVISIBLE); //убираем его с глаз
             try {  //оборачиваем все в try ... catch на случай ошибок
-                String input = strJson.substring(strJson.indexOf("["), strJson.indexOf("]") + 1);
-                JSONArray mainArray = new JSONArray(input);
+                String input = "";
+                if (strJson.length() > 45) input = strJson.substring(strJson.indexOf("["), strJson.indexOf("]") + 1);
+                JSONArray mainArray = new JSONArray();
+                if (input.length() != 0) mainArray = new JSONArray(input);
 
-                List<Pair> pairs = new ArrayList<>();
+                if (mainArray.length() != 0) {
+                    List<Pair> pairs = new ArrayList<>();
 
-                for (int i = 0; i < mainArray.length(); i++){
-                    JSONObject item = mainArray.getJSONObject(i);
-                    Pair pair = new Pair(item);
-                    pairs.add(pair);
-                }
-
-                for (int i = 1; i < 7; i++) {
-                    if (i == 1) addWidget("Понедельник", R.color.color_dayWeekStyle);
-                    if (i == 2) addWidget("Вторник", R.color.color_dayWeekStyle);
-                    if (i == 3) addWidget("Среда", R.color.color_dayWeekStyle);
-                    if (i == 4) addWidget("Четверг", R.color.color_dayWeekStyle);
-                    if (i == 5) addWidget("Пятница", R.color.color_dayWeekStyle);
-                    if (i == 6) addWidget("Суббота", R.color.color_dayWeekStyle);
-                    List<Pair> pairsOnThisDay = new ArrayList<>();
-                    for (Pair pair : pairs){
-                        if (pair.DayWeek == i) pairsOnThisDay.add(pair);
+                    for (int i = 0; i < mainArray.length(); i++) {
+                        JSONObject item = mainArray.getJSONObject(i);
+                        Pair pair = new Pair(item);
+                        pairs.add(pair);
                     }
-                    Collections.sort(pairsOnThisDay, new Comparator<Pair>() {
-                        @Override
-                        public int compare(Pair lhs, Pair rhs) {
-                            return lhs.NumberLesson - rhs.NumberLesson;
+
+                    for (int i = 1; i < 7; i++) {
+                        if (i == 1) addWidget("Понедельник", R.color.color_dayWeekStyle);
+                        if (i == 2) addWidget("Вторник", R.color.color_dayWeekStyle);
+                        if (i == 3) addWidget("Среда", R.color.color_dayWeekStyle);
+                        if (i == 4) addWidget("Четверг", R.color.color_dayWeekStyle);
+                        if (i == 5) addWidget("Пятница", R.color.color_dayWeekStyle);
+                        if (i == 6) addWidget("Суббота", R.color.color_dayWeekStyle);
+                        List<Pair> pairsOnThisDay = new ArrayList<>();
+                        for (Pair pair : pairs) {
+                            if (pair.DayWeek == i) pairsOnThisDay.add(pair);
                         }
-                    });
-                    for (int j = 0; j < pairsOnThisDay.size(); j++){
-                        if (j % 2 == 0) addWidget(pairsOnThisDay.get(j).toString(), R.color.color_firstPairStyle);
-                            else addWidget(pairsOnThisDay.get(j).toString(), R.color.color_secondPairStyle);
+                        Collections.sort(pairsOnThisDay, new Comparator<Pair>() {
+                            @Override
+                            public int compare(Pair lhs, Pair rhs) {
+                                return lhs.NumberLesson - rhs.NumberLesson;
+                            }
+                        });
+                        for (int j = 0; j < pairsOnThisDay.size(); j++) {
+                            if (j % 2 == 0)
+                                addWidget(pairsOnThisDay.get(j).toString(), R.color.color_firstPairStyle);
+                            else
+                                addWidget(pairsOnThisDay.get(j).toString(), R.color.color_secondPairStyle);
+                        }
                     }
-                }
+                } else addWidget("<h2>Расписание на текущую неделю не найдено</h2>", R.color.color_firstPairStyle);
+
+//                addWidget(titleShedule, R.color.color_dayWeekStyle);
+//                addWidget(weekShedule, R.color.color_secondPairStyle);
+//                addWidget(jsonShedule, R.color.color_dayWeekStyle);
 
             } catch (Exception e) {
-                addWidget("Ошибка вывода: " + e.toString(), R.color.color_dayWeekStyle);
+                String stackTrace = "";
+                for (StackTraceElement element : e.getStackTrace()){
+                    stackTrace += element.toString() + "\t\n";
+                }
+                addWidget("Ошибка вывода: " + e.toString() + "\n" + stackTrace, R.color.color_dayWeekStyle);
+
+                addWidget(titleShedule, R.color.color_dayWeekStyle);
+                addWidget(weekShedule, R.color.color_secondPairStyle);
+                addWidget(jsonShedule, R.color.color_dayWeekStyle);
+
             }
         }
     }
