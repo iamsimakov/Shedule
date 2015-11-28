@@ -81,13 +81,11 @@ public class MainActivity extends AppCompatActivity {
                 conn.header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:41.0) Gecko/20100101 Firefox/41.0");
                 conn.header("Referer", "http://gu-unpk.ru/schedule");
                 conn.header("Host", "gu-unpk.ru");
-                conn.header("Cookie", "PHPSESSID=mio86qcgdedmt69rq720khhvs7; blind-font-size=fontsize-normal; blind-colors=color1; blind-font=sans-serif; blind-spacing=spacing-small; blind-images=imagesoff; _ga=GA1.2.1710176856.1446161737; _gat=1; _ym_visorc_16652224=w; CurrentSchedule=lesson; StudPrepAudit=1; divisionForStuds=12; kurs=5; group=3094");
+                conn.header("Cookie", "blind-font-size=fontsize-normal; blind-colors=color1; blind-font=sans-serif; blind-spacing=spacing-small; blind-images=imagesoff; _ga=GA1.2.1710176856.1446161737; _gat=1; _ym_visorc_16652224=w; CurrentSchedule=lesson; StudPrepAudit=1; divisionForStuds=12; kurs=5; group=3094");
                 conn.header("Connection", "keep-alive");
                 conn.header("Accept-Language", "ru-RU,ru;q=0.8,en-US;q=0.5,en;q=0.3");
-//                conn.data("Accept-Encoding: gzip, deflate");
                 conn.header("Accept", "*/*");
-//                conn.referrer("http%3A%2F%2F4pda.ru%2Fforum%2Findex.php%3F");
-                Document doc = conn.url("http://gu-unpk.ru/schedule/3094////1445817600168/printschedule").ignoreContentType(true).get();
+                Document doc = conn.url("http://gu-unpk.ru/schedule/3094////").ignoreContentType(true).get();
                 resultJson = doc.toString(); //буфер - это объект, переводим в строку
 
                 jsonShedule = resultJson;
@@ -95,8 +93,6 @@ public class MainActivity extends AppCompatActivity {
                 Document document = conn.url("http://gu-unpk.ru/schedule").get();
 
                 titleShedule = document.getElementById("page-wrap").getElementById("inside").getElementById("content").getElementById("content_table").getElementsByAttribute("title_schedule").html();
-//                weekShedule = document.getElementById("page-wrap").getElementById("inside").getElementById("content").select("div[style=\"margin-top: 10px; margin-bottom: 0px\"]").html();
-//                .getElementById("week_schedule")
             } catch (Exception e) {
                 resultJson = "Ошибка чтения: " + e.toString();
             }
