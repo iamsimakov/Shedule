@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Html;
+import android.text.util.Linkify;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -23,10 +24,14 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -67,25 +72,21 @@ public class MainActivity extends AppCompatActivity {
         private String jsonShedule = "";
         private String titleShedule = "";
         private String weekShedule = "";
+        private Long startWeek;
+        private Long endWeek;
 
         @Override
         protected String doInBackground(Void... params) {
 
             String resultJson = "";
-
             // получаем данные с внешнего ресурса
             try {
+                Date date = new Date();
+                startWeek = date.getTime() - (date.getDay() - 1) * 24 * 60 * 60 * 1000L - (date.getHours() - 3) * 60 * 60 * 1000L - date.getMinutes() * 60 * 1000L - date.getSeconds() * 1000L;
+                endWeek = startWeek + 6 * 24 * 60 * 60 * 1000L;
                 Connection conn = Jsoup.connect("http://gu-unpk.ru/schedule/");
                 conn.method(Connection.Method.GET);
-                conn.header("x-requested-with", "XMLHttpRequest");
-                conn.header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:41.0) Gecko/20100101 Firefox/41.0");
-                conn.header("Referer", "http://gu-unpk.ru/schedule");
-                conn.header("Host", "gu-unpk.ru");
-                conn.header("Cookie", "blind-font-size=fontsize-normal; blind-colors=color1; blind-font=sans-serif; blind-spacing=spacing-small; blind-images=imagesoff; _ga=GA1.2.1710176856.1446161737; _gat=1; _ym_visorc_16652224=w; CurrentSchedule=lesson; StudPrepAudit=1; divisionForStuds=12; kurs=5; group=3094");
-                conn.header("Connection", "keep-alive");
-                conn.header("Accept-Language", "ru-RU,ru;q=0.8,en-US;q=0.5,en;q=0.3");
-                conn.header("Accept", "*/*");
-                Document doc = conn.url("http://gu-unpk.ru/schedule/3094////").ignoreContentType(true).get();
+                Document doc = conn.url("http://gu-unpk.ru/schedule/3094////" + String.valueOf(startWeek) /*1448236800364*/ + "/printschedule").ignoreContentType(true).get();
                 resultJson = doc.toString(); //буфер - это объект, переводим в строку
 
                 jsonShedule = resultJson;
@@ -111,6 +112,9 @@ public class MainActivity extends AppCompatActivity {
                 JSONArray mainArray = new JSONArray();
                 if (input.length() != 0) mainArray = new JSONArray(input);
 
+                Format format = new SimpleDateFormat("dd/MMM/yyyy", Locale.ENGLISH);
+                addWidget(String.format("Расписание занятий на период %s - %s", format.format(startWeek), format.format(endWeek)), R.color.color_dayWeekStyle);
+
                 if (mainArray.length() != 0) {
                     List<Pair> pairs = new ArrayList<>();
 
@@ -127,6 +131,9 @@ public class MainActivity extends AppCompatActivity {
                         if (i == 4) addWidget("Четверг", R.color.color_dayWeekStyle);
                         if (i == 5) addWidget("Пятница", R.color.color_dayWeekStyle);
                         if (i == 6) addWidget("Суббота", R.color.color_dayWeekStyle);
+
+//                        addWidget(String.valueOf(startWeek), R.color.color_dayWeekStyle);
+
                         List<Pair> pairsOnThisDay = new ArrayList<>();
                         for (Pair pair : pairs) {
                             if (pair.DayWeek == i) pairsOnThisDay.add(pair);
@@ -146,6 +153,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 } else addWidget("<h2>Расписание на текущую неделю не найдено</h2>", R.color.color_firstPairStyle);
 
+                addWidget("http://gu-unpk.ru/schedule", R.color.color_dayWeekStyle);
 //                addWidget(titleShedule, R.color.color_dayWeekStyle);
 //                addWidget(weekShedule, R.color.color_secondPairStyle);
 //                addWidget(jsonShedule, R.color.color_dayWeekStyle);
@@ -160,6 +168,7 @@ public class MainActivity extends AppCompatActivity {
                 addWidget(titleShedule, R.color.color_dayWeekStyle);
                 addWidget(weekShedule, R.color.color_secondPairStyle);
                 addWidget(jsonShedule, R.color.color_dayWeekStyle);
+                addWidget("http://gu-unpk.ru/schedule", R.color.color_dayWeekStyle);
 
             }
         }
@@ -171,6 +180,7 @@ public class MainActivity extends AppCompatActivity {
         text.setTextColor(getResources().getColor(R.color.color_text));
         text.setText(Html.fromHtml(str));
         text.setBackgroundResource(color);
+        Linkify.addLinks(text, Linkify.WEB_URLS);
         info.addView(text);
     }
 
