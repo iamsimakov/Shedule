@@ -14,21 +14,9 @@
 
 {"NumberSubGruop":0,"TitleSubject":"Основы автоматизированных систем управления технологическими процессами","TypeLesson":"пр","NumberLesson":8,"DayWeek":5,"Korpus":"2","NumberRoom":"616","special":"","title":"5-2","employee_id":1247,"fam":"Косчинский","im":"Станислав","otch":"Леонидович","StartDate":null,"FinishDate":null}]
 
-<p id="title_schedule" style="display:inline">Расписание занятий для группы 5-2 на эту неделю не найдено</p>
-<p id="week_schedule">Неделя: 26.10.2015 - 1.11.2015 (9)</p>
 
-
-
-
-x-requested-with: XMLHttpRequest
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:41.0) Gecko/20100101 Firefox/41.0
-Referer: http://gu-unpk.ru/schedule
-Host: gu-unpk.ru
-Cookie: PHPSESSID=mio86qcgdedmt69rq720khhvs7; blind-font-size=fontsize-normal; blind-colors=color1; blind-font=sans-serif; blind-spacing=spacing-small; blind-images=imagesoff; _ga=GA1.2.1710176856.1446161737; _gat=1; _ym_visorc_16652224=w; CurrentSchedule=lesson; StudPrepAudit=1; divisionForStuds=12; kurs=5; group=3094
-Connection: keep-alive
-Accept-Language: ru-RU,ru;q=0.8,en-US;q=0.5,en;q=0.3
-Accept-Encoding: gzip, deflate
-Accept: */*
-
+http://gu-unpk.ru/schedule/divisionlistforstuds
+http://gu-unpk.ru/schedule/12/kurslist
+http://gu-unpk.ru/schedule/12/5/grouplist
 http://gu-unpk.ru/schedule/3094////1445817600168/printschedule
-get
+
