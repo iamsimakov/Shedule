@@ -1,5 +1,6 @@
 package com.example.alex.myapplication;
 
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -8,7 +9,7 @@ import java.util.Date;
 /**
  * Created by Alex on 30.10.2015.
  */
-public class Pair {
+public class Pair{
     public int NumberSubGruop;
     public String TitleSubject;
     public String TypeLesson;
